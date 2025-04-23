@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 from collections.abc import Iterable
+import pandas as pd
 import pandas.io.formats.style
 
 
