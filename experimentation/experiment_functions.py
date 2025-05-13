@@ -1,4 +1,7 @@
 
+from google.cloud import bigquery
+import pandas as pd
+
 proj = 'etsy-bigquery-adhoc-prod'
 client = bigquery.Client(project = proj)
 
