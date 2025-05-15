@@ -263,7 +263,17 @@ def get_variant_stats(experiment_id):
 
 
 # Get All Experiment Receipts
-def get_experiment_receipts(experiment_id, variant1, variant2):
+def get_experiment_receipts(experiment_id, variant1 = None, variant2 = None):
+
+  if variant1 and variant2:
+    var_filt = f"and catapult_experiment_receipts.variant_id in ('{variant1}', '{variant2}')"
+  elif (not variant1) and (not variant2):
+    var_filt = ""
+  else:
+    print("Please either pass 2 variant ids or none (to get all variant details)")
+    var_filt = ""
+    return
+
   query = f"""
   DECLARE experiment_name STRING;
   SET experiment_name = '{experiment_id}';
@@ -458,6 +468,7 @@ def get_experiment_receipts(experiment_id, variant1, variant2):
   SELECT
       catapult_experiment_receipts.variant_id  AS variant
       , catapult_experiment_receipts.receipt_id
+      , catapult_experiment_receipts.bucketing_id
       , COALESCE(cast(all_receipts.gms_gross as float64), 0) AS gms_gross
       , COALESCE(cast(all_receipts.gms_net as float64), 0) AS gms_net
       , COALESCE(cor.brs, 0) bad_recoupments
@@ -467,8 +478,8 @@ def get_experiment_receipts(experiment_id, variant1, variant2):
   LEFT JOIN all_receipts ON catapult_experiment_receipts.receipt_id = all_receipts.receipt_id
   LEFT JOIN (select receipt_id, sum(case when cor_stream in ('bad_recoupment') then amount_usd else null end) brs, sum(case when cor_stream in ('chargeback', 'chargeback_fee') then amount_usd else null end) cbs from `etsy-data-warehouse-prod.rollups.cor_main` group by 1) cor ON catapult_experiment_receipts.receipt_id = cor.receipt_id
   WHERE (catapult_experiment_receipts.experiment_id ) = experiment_name
-  and catapult_experiment_receipts.receipt_id is not null
-  and catapult_experiment_receipts.variant_id in ('{variant1}', '{variant2}')
+  -- and catapult_experiment_receipts.receipt_id is not null
+  {var_filt}
   """
 
   df = query_to_df(query)
