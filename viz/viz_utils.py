@@ -5,6 +5,8 @@ import pandas as pd
 import pandas.io.formats.style
 
 
+# credit to @Patrick L (pjxl) for EtsyColors & QStyler
+
 class EtsyColors():
     """
     Instantiate an object with a `library` property containing Etsy's brand colors.
