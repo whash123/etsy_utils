@@ -512,3 +512,39 @@ def bootstrap_sample(data, variant_col, metric_type, control_id, treatment_id, n
 
   return diff_means, means_control, means_treatment
 
+
+
+# Return Confidence Interval, Given a Difference Array and a P-Value
+def return_conf_interval(array, p_val):
+  if test_type == 'one-tailed':
+    if one_tail_direction == 'increase':
+      confidence_interval = np.percentile(array, [100 * p_val, 100])
+    elif one_tail_direction == 'decrease':
+      confidence_interval = np.percentile(array, [0, 100 * (1 - p_val)])
+    else:
+      print('please enter a direction for the 1-tailed test')
+  elif test_type == 'two-tailed':
+    confidence_interval = np.percentile(array, [(100 * p_val / 2), 100 * (1 - (p_val / 2))])
+  
+  return confidence_interval
+
+
+
+# Function to Return Markdown Text for Experiment Results
+def return_results():
+  str1 = f"{int(100 * (1 - p_value))}% Confidence Interval for {test_type.title()} Test Between '{treatment_picker.value.title()}' and '{control_picker.value.title()}': ({round(confidence_interval[0], 4)} - {round(confidence_interval[1], 4)})"
+  if confidence_interval[0] <= 0 <= confidence_interval[1]:
+    str2 = f"Unable to reject the null hypothesis:"
+    str3 = f"The results did not show a statistically significant difference between '{treatment_picker.value.title()}' and '{control_picker.value.title()}"
+  else:
+    str2 = f"Significant difference between '{treatment_picker.value.title()}' and '{control_picker.value.title()}'"
+    str3 = f"The results indicate a statistically significant difference between '{treatment_picker.value.title()}' and '{control_picker.value.title()}"
+
+  output = f"""
+  # <u>Experiment Results</u>
+  ## {str1}
+  ## {str2}
+  ### *{str3}*
+  """  
+
+  return md(output)
