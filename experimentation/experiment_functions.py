@@ -515,7 +515,7 @@ def bootstrap_sample(data, variant_col, metric_type, control_id, treatment_id, n
 
 
 # Return Confidence Interval, Given a Difference Array and a P-Value
-def return_conf_interval(array, p_val):
+def return_conf_interval(array, p_val, test_type):
   if test_type == 'one-tailed':
     if one_tail_direction == 'increase':
       confidence_interval = np.percentile(array, [100 * p_val, 100])
